@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DiziWatch</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="logo">
+      <h1>DiziWatch</h1>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <section class="video-section">
+      <video id="animePlayer" controls preload="metadata">
+        <source src="aot_s1e1_eng_dub.mp4" type="video/mp4" label="English Dub" />
+        <source src="aot_s1e1_jap_dub.mp4" type="video/mp4" label="Japanese Dub" />
+        <track label="Türkçe Altyazı" kind="subtitles" srclang="tr" src="aot_s1e1_tr.vtt" default>
+        <track label="English Subtitles" kind="subtitles" srclang="en" src="aot_s1e1_en.vtt">
+        Your browser does not support the video tag.
+      </video>
+
+      <div class="controls">
+        <button onclick="seek(-10)">⏪ 10s</button>
+        <button onclick="seek(10)">10s ⏩</button>
+        <label for="volume">Səs:</label>
+        <input type="range" id="volume" min="0" max="1" step="0.1" onchange="changeVolume(this.value)" />
+      </div>
+    </section>
+
+    <section class="comments">
+      <h2>Rəylər</h2>
+      <textarea id="commentInput" placeholder="Fikirlərini yaz..." rows="4"></textarea>
+      <button onclick="submitComment()">Göndər</button>
+      <div id="commentList"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Created by Elmir</p>
+  </footer>
+
+  <script>
+    const player = document.getElementById('animePlayer');
+
+    function seek(seconds) {
+      player.currentTime += seconds;
+    }
+
+    function changeVolume(value) {
+      player.volume = value;
+    }
+
+    // Simple 5s ad simulation before play
+    player.addEventListener('play', () => {
+      if (!player.dataset.adPlayed) {
+        player.pause();
+        alert("5 saniyəlik reklam...");
+        setTimeout(() => {
+          player.play();
+          player.dataset.adPlayed = true;
+        }, 5000);
+      }
+    });
+
+    // Comment system using localStorage
+    const commentList = document.getElementById('commentList');
+    const commentInput = document.getElementById('commentInput');
+
+    function loadComments() {
+      const comments = JSON.parse(localStorage.getItem('comments')) || [];
+      commentList.innerHTML = comments.map(c => `<p>${c}</p>`).join('');
+    }
+
+    function submitComment() {
+      const comment = commentInput.value.trim();
+      if (comment) {
+        const comments = JSON.parse(localStorage.getItem('comments')) || [];
+        comments.push(comment);
+        localStorage.setItem('comments', JSON.stringify(comments));
+        commentInput.value = '';
+        loadComments();
+      }
+    }
+
+    loadComments();
+  </script>
+</body>
+</html>
